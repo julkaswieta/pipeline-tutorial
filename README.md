@@ -26,6 +26,34 @@ In the root of your project (where your .git folder is) create a directory '.git
 
 ### Syntax
 
+#### On
+
+This is how you declare what events will cause the pipeline to run.
+
+#### Jobs
+
+A collection of actions that represent one item in you pipeline.
+
+#### Runs On
+
+Declaration of which operating system will run your job.
+
+#### Steps
+
+List of actions contained in a job.
+
+#### Uses
+
+Call an existing action.
+
+#### Run
+
+Run a command.
+
+Tip: You can run a sequence of commands using pipes.
+
+### A Basic Workflow
+
 ``` yml
 name: <Name of your pipeline> 
 
@@ -83,14 +111,11 @@ Now you can setup dotnet.
         dotnet-version: 8.0
 ```
 
-Then you can restore the workloads and dependencies your project needs to build:
+Then you can restore the workloads your project needs to build (like MAUI):
 
 ``` yml
     - name: Restore workloads
       run: dotnet workload restore <Path to .csproj>
-
-    - name: Restore dependencies
-      run: dotnet restore <Path to .csproj>
 ```
 
 Side note:
@@ -120,9 +145,6 @@ jobs:
 
     - name: Restore workloads
       run: dotnet workload restore <path to .csproj>
-
-    - name: Restore dependencies
-      run: dotnet restore <path to .csproj>
 
     - name: build
       run: dotnet build <path to .csproj>
