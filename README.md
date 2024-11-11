@@ -26,7 +26,7 @@ In the root of your project (where your .git folder is) create a directory '.git
 
 ### Syntax
 
-```
+``` yml
 name: <Name of your pipeline> 
 
 # What events cause the pipeline to run
@@ -56,28 +56,81 @@ Now that you have an understanding of the syntax used in workflow files, you sho
 It's important to remember that all commands will be executed from the root of your project, so you may need to supply a path to your .csproj file.
 
 
-```
+``` yml
     - name: build
       run: dotnet build <path to .csproj file>
 ```
 
-If you try to run a this, it may not work because the runner is missing some important resources:
-*   The dependencies your program relies on
+If you try to run this, it may not work because the runner is missing some important resources:
+*   The Dotnet framework
 *   Your repository code
+*   The dependencies your program relies on
 
 
 The first step of your pipeline will probably be checking out the code from your repo using the following action:
-``` - uses: actions/checkout@v4 ```
+``` yml
+    - uses: actions/checkout@v4 
+```
+This is an example of ... stored action thingy.
+
+
+Now you can setup dotnet.
+
+``` yml
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0
+```
 
 Then you can restore the workloads and dependencies your project needs to build:
 
-```
+``` yml
     - name: Restore workloads
       run: dotnet workload restore <Path to .csproj>
 
     - name: Restore dependencies
       run: dotnet restore <Path to .csproj>
 ```
+
+Side note:
+    You might notice that you are reusing certain values throughout your pipeline, such as the path to your project file. To reduce reuse, you can set up a variable in github to make future modification more efficient.
+
+    ...
+
+Here is an example workflow file that automatically builds a MAUI app.
+
+``` yml
+name: Build MAUI App 
+
+on:
+  [pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0
+
+    - name: Restore workloads
+      run: dotnet workload restore <path to .csproj>
+
+    - name: Restore dependencies
+      run: dotnet restore <path to .csproj>
+
+    - name: build
+      run: dotnet build <path to .csproj>
+    
+```
+
+
+
 
 ## 3. External Tools
 
