@@ -9,8 +9,8 @@ In this tutorial, you learn how to:
 *   Setup automated builds and testing.
 *   Add useful external tools:
     *   Sonar static analysis
-    *   Doxygen documentation
-*   Add database migration using entity framework.
+    *   Doxygen
+    *   Database migration using entity framework
 
 
 
