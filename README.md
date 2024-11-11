@@ -26,33 +26,14 @@ In the root of your project (where your .git folder is) create a directory '.git
 
 ### Syntax
 
-#### On
-
-This is how you declare what events will cause the pipeline to run.
-
-#### Jobs
-
-A collection of actions that represent one item in you pipeline.
-
-#### Runs On
-
-Declaration of which operating system will run your job.
-
-#### Steps
-
-List of actions contained in a job.
-
-#### Uses
-
-Call an existing action.
-
-#### Run
-
-Run a command.
-
-Tip: You can run a sequence of commands using pipes.
-
-### A Basic Workflow
+| Keyword   | Description   |
+| --- | --- |
+| on   | This is how you declare what events will cause the pipeline to run.   |
+| jobs   | A collection of actions that represent one item in you pipeline.   |
+| runs-on   | Declaration of which operating system will run your job.    |
+| steps  | List of actions contained in a job.    |
+| Uses  | Call an existing action.    |
+| Run  | Run a command. Tip: You can run a sequence of commands using pipes.    |
 
 ``` yml
 name: <Name of your pipeline> 
