@@ -128,7 +128,7 @@ jobs:
       run: dotnet build <path to .csproj>
 ```
 
-It might be useful to automatically test you code in pull requests, so that only valid changes will be merged into your project. To accomplish this you can add another step to run dotnet test.
+It might be useful to automatically test your code in pull requests, so that only valid changes will be merged into your project. To accomplish this you can add another step to run dotnet test.
 
 ``` yml
     - name: test
