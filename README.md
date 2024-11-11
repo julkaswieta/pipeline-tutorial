@@ -49,7 +49,7 @@ jobs:
 All syntax is available in the [Github Actions Documentation](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)
 
 
-## 2. Building and Testing
+## 2. Building and Testing .Net
 
 Now that you have an understanding of the syntax used in workflow files, you should be able to setup a build step using the standard dotnet build command.
 
