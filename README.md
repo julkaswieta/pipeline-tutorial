@@ -13,6 +13,16 @@ In this tutorial, you learn how to:
     *   Database migration using entity framework
 
 
+You will need a dotnet project for this tutorial to work.
 
+## 1. Github Actions
 
+Setup (or assume) a github rep?
+Public repo, so you don't incur costs
+
+### Workflow File
+
+In the root of your project (where your .git folder is) create a directory'.github/workflows'. Any .yml file in this folder will be interpreted as a pipeline in Github Actions. You can now create a file named 'workflow.yml', which will store all the instructions for your pipeline.
+
+### Syntax
 
