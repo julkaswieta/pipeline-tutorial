@@ -149,7 +149,11 @@ It might be useful to automatically test your code in pull requests, so that onl
 
 
 ### Sonar
+Make an account in [sonarcloud](https://www.sonarsource.com/products/sonarcloud/signup/)
 
+![Fig. 1. Sonar Cloud Signup Page](images/sonar-signup.png)
+
+Setup a project in sonarcloud
 
 ### Doxygen
 
