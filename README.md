@@ -32,8 +32,9 @@ In the root of your project (where your .git folder is) create a directory '.git
 | jobs   | A collection of actions that represent one item in you pipeline.   |
 | runs-on   | Declaration of which operating system will run your job.    |
 | steps  | List of actions contained in a job.    |
-| Uses  | Call an existing action.    |
-| Run  | Run a command. Tip: You can run a sequence of commands using pipes.    |
+| uses  | Call an existing action.    |
+| run  | Run a command. Tip: You can run a sequence of commands using pipes.    |
+
 
 ``` yml
 name: <Name of your pipeline> 
@@ -57,6 +58,11 @@ jobs:
 ```
 All syntax is available in the [Github Actions Documentation](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)
 
+### Secrets and Variables
+
+Sometimes, you may need environment variables or secrets in your pipeline. Github has a solution for this: Secrets & Variables.
+
+> Something about secrets :)
 
 ## 2. Building and Testing .Net
 
