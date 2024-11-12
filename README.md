@@ -137,6 +137,8 @@ jobs:
       run: dotnet build <path to .csproj>
 ```
 
+> When building a MAUI app, you might need to supply a --framework condition like: --framework net8.0
+
 It might be useful to automatically test your code in pull requests, so that only valid changes will be merged into your project. To accomplish this you can add another step to run dotnet test.
 
 ``` yml
@@ -152,6 +154,11 @@ It might be useful to automatically test your code in pull requests, so that onl
 Make an account in [sonarcloud](https://www.sonarsource.com/products/sonarcloud/signup/)
 
 ![Fig. 1. Sonar Cloud Signup Page](images/sonar-signup.png)
+
+Make a new organisation, you can import one form Github or make one manually in sonar cloud.
+
+
+
 
 Setup a project in sonarcloud
 
