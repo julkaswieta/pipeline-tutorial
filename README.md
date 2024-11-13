@@ -157,10 +157,68 @@ Make an account in [sonarcloud](https://www.sonarsource.com/products/sonarcloud/
 
 Make a new organisation, you can import one form Github or make one manually in sonar cloud.
 
+Setup a project in sonarcloud, making note of the token.
+
+Make a variable in Github that stores the token provided by sonar cloud.
 
 
 
-Setup a project in sonarcloud
+Add all this stuff to your workflow file.
+
+``` yml
+
+    #Setup a Java JDK
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+        distribution: 'zulu'
+
+    #Cache Sonar Dependencies
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v4
+      with:
+        path: ~/sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: Cache SonarCloud scanner
+      id: cache-sonar-scanner
+      uses: actions/cache@v4
+      with:
+        path: ./.sonar/scanner
+        key: ${{ runner.os }}-sonar-scanner
+        restore-keys: ${{ runner.os }}-sonar-scanner
+
+
+    #Install the SonarCloud Scanner
+    - name: Install SonarCloud scanner
+      if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ./.sonar/scanner
+        cd ./Pipeline
+        dotnet tool update dotnet-sonarscanner --tool-path ../.sonar/scanner
+
+    
+        - name: Start Sonar Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:<key>" /o:"<organisation>" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+
+    #Build and test steps here
+    #
+    #
+    #
+
+    - name: End Sonar Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+```
+
+
 
 ### Doxygen
 
