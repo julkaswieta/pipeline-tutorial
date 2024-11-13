@@ -166,7 +166,6 @@ Make a variable in Github that stores the token provided by sonar cloud.
 Add all this stuff to your workflow file.
 
 ``` yml
-
     #Setup a Java JDK
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -190,7 +189,6 @@ Add all this stuff to your workflow file.
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
 
-
     #Install the SonarCloud Scanner
     - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
@@ -199,7 +197,6 @@ Add all this stuff to your workflow file.
         cd ./Pipeline
         dotnet tool update dotnet-sonarscanner --tool-path ../.sonar/scanner
 
-    
     - name: Start Sonar Analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -219,6 +216,74 @@ Add all this stuff to your workflow file.
 ```
 
 ### Doxygen
+
+Doxygen is a tool that generates a web-based representation of your project's documentation. It takes the comments from your code and produces HTML files with all of the details.
+
+
+![Fig. 2. Example Doxygen Output](images/Doxygen_Example.png)
+
+It might be best to create a new workflow file that runs only on pushes to master, so that your documentation site is not updated with anything outside of your main branch.
+
+``` yml
+name: Documentation 
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: sudo apt-get install doxygen -y
+
+    - name: Generate Doxygen Documentation
+      run: doxygen <path to Doxygen file>
+```
+
+This job generates the documentation but it would be better if we could access it from the web. To do this, you can use Github pages by uploading the generated artifacts and then deploying to Github pages.
+
+First you must add a step to the 'generate' job which uploads the artifacts to Github pages:
+
+> You will need write permissions for the job to access Github pages.
+
+
+``` yml
+    permissions:
+      pages: write
+      id-token: write
+
+    - name: Upload static files as artifact
+      uses: actions/upload-pages-artifact@v3 
+      with:
+        path: html
+```
+
+
+You should add a new job called 'deploy' after the generation job with the following contents.
+
+``` yml
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
 
 
 ### Database Migration
