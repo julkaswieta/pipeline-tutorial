@@ -200,7 +200,7 @@ Add all this stuff to your workflow file.
         dotnet tool update dotnet-sonarscanner --tool-path ../.sonar/scanner
 
     
-        - name: Start Sonar Analysis
+    - name: Start Sonar Analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
@@ -217,8 +217,6 @@ Add all this stuff to your workflow file.
       run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
 ```
-
-
 
 ### Doxygen
 
