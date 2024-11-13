@@ -287,3 +287,14 @@ You should add a new job called 'deploy' after the generation job with the follo
 
 
 ### Database Migration
+
+After updating the datamodels in your application, you can use entity framework to migrate those changes into your database.
+
+
+``` yml
+- name: Migrate Database
+  run: |
+      dotnet ef migrations add ${{ github.run_number }}
+      dotnet ef database update
+```
+
