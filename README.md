@@ -1,9 +1,8 @@
-# Github Actions Tutorial
+# Implementing a continuous integration pipeline with GitHub Actions 
 
-This tutorial will demonstrate how to create a pipeline using Github Actions and set up some external tools that will make the pipeline useful for continuous intigration.
+This tutorial will demonstrate how you can create a continuous integration pipeline using Github Actions and set up some external tools that will be used in the pipeline. 
 
-In this tutorial, you learn how to:
-
+In this tutorial, you will learn how to:
 *   Create a Github Actions workflow file.
 *   Run your pipeline in the cloud.
 *   Setup automated builds and testing.
@@ -12,8 +11,10 @@ In this tutorial, you learn how to:
     *   Doxygen
     *   Database migration using entity framework
 
+### Before you start
+Before you start working through this tutorial, it might be useful to take a look at the notes about Continuous Integration/Deployment, and DevOps in general. This will explain the concepts we use in this tutorial. You can find these here: [DevOps notes](https://edinburgh-napier.github.io/remote_test/notes/unit7_devops/).
 
-You will need a dotnet project to follow this tutorial.
+To work through the steps outlined in this document, you need to have a dotnet project. This pipeline should work with any dotnet project, but for the purpose of this module, make sure you have completed the first tutorial on setting up a MAUI project, which you can find here: [Getting started with MAUI](https://edinburgh-napier.github.io/remote_test/tutorials/csharp/maui/maui.html).
 
 ## 1. Github Actions
 
