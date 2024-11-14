@@ -88,32 +88,47 @@ CI/CD pipelines run automatically in the cloud so they don't have access to thos
 
 You should use secrets for anything that could be exploited to gain unauthorised access, e.g. connection strings, API keys, passwords, access tokens etc.
 
+## 2. Setting up your workflow file
+Now that you have an understanding of the syntax used in workflow files, you can move on to implementing your own workflow.
+
+The first step in creating pipelines is deciding what events will trigger the runs. It could run anytime something is pushed to any of the branches, or only to some selected branches. Another option is to run the workflow on pull requests, which we will use as an example in this tutorial. A full breakdown can be found in the documentation: [Triggering a workflow](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow). 
+
+Start your file by putting the following code in the `workflow.yml` file:
+```yml
+name: Build & Test # the name can be anything else you want
+
+on: 
+  [pull_request]
+```
+
+The next step will be deciding what actions get executed in the jobs. 
+
 ## 2. Building and Testing .Net
+You can now move on to defining what jobs and actions will be executed in the workflow. You also need to decide what operating system will be used for the runner. For this project, we will use the lastest version of Windows. Add this code to your workflow file:
 
-Now that you have an understanding of the syntax used in workflow files, you should be able to setup a build step using the standard dotnet build command.
-
-It's important to remember that all commands will be executed from the root of your project, so you may need to supply a path to your .csproj file.
-
-
-``` yml
-    - name: build
-      run: dotnet build <path to .csproj file>
+```yml
+jobs:
+  build: # this is just a name of the job, it can be changed to something else if you wish
+    
+    runs-on: windows-latest
 ```
 
-If you try to run this, it may not work because the runner is missing some important resources:
-*   The Dotnet framework
-*   Your repository code
-*   The dependencies your program relies on
+Now you can start defining the order of the steps in the job. Usually, the starting point is ensuring that the workflow can access the source code. In GitHub Actions, you can use a standard action that checks out the code from the repository. You can do this by using this code:
 
+```yml
+jobs:
+  build:
 
-The first step of your pipeline will probably be checking out the code from your repo using the following action:
-``` yml
-    - uses: actions/checkout@v4 
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 ```
-This is an example of ... stored action thingy.
 
+The next step is ensuring that the environment is set up properly and all tools needed to build the code are installed. In .NET projects, this involves setting up the .NET SDK and restoring workloads. 
 
-Now you can setup dotnet.
+To set up the SDK, you can use a ready-made action and provide it with the version of .NET that you require:
 
 ``` yml
     - name: Setup .NET
@@ -122,44 +137,47 @@ Now you can setup dotnet.
         dotnet-version: 8.0
 ```
 
-Then you can restore the workloads your project needs to build (like MAUI):
+Workloads in .NET projects are various additional tools, libraries or features that are not included by default in the SDK, for example MAUI. They are defined in the `.csproj` file so the command that does it needs a correct path to that file. It's important to remember that all commands will be executed from the root of your project, so you may need to supply a path to your .csproj file.
 
-``` yml
+```yml
     - name: Restore workloads
       run: dotnet workload restore <Path to .csproj>
 ```
 
-Side note:
-    You might notice that you are reusing certain values throughout your pipeline, such as the path to your project file. To reduce reuse, you can set up a variable in github to make future modification more efficient.
-
-    ...
-
-Here is an example workflow file that automatically builds a MAUI app.
+Now that you've got the source code checked out and the environment set up, you can move on to building the project. This is done by running `dotnet build` like so:
 
 ``` yml
-name: Build MAUI App 
-
-on:
-  [pull_request]
-
-jobs:
-  build:
-    runs-on: windows-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0
-
-    - name: Restore workloads
-      run: dotnet workload restore <path to .csproj>
-
-    - name: build
-      run: dotnet build <path to .csproj>
+    - name: Build project
+      run: dotnet build <path to .csproj file>
 ```
+
+## Optional: Adding environment variables to GitHub
+You might notice that you are reusing certain values throughout your pipeline, such as the path to your project file. To encourage reuse, you can set up a variable in GitHub to make future modification more efficient.
+
+To add a variable, navigate to the Settings tab in the repository 
+
+![Settings tab in GitHub](images/settings-tab.png)
+
+In the menu on the left, navigate to `Secrets and variables` > `Actions`
+
+![Actions settings](images/actions-menu.png)
+
+Switch to the `Variables` tab and select `New repository variable`.
+
+![Variables tab](images/variables.png)
+
+This will take you to a page where you give a name to your variable, e.g. `CSPROJ_PATH`, and the value, which is the path to your `.csproj` file in this example.
+
+![Adding a variable](images/add-variable.png)
+
+After you add the variable in GitHub, you can use it in your workflow file like this:
+
+```yml
+- name: Build
+  run: dotnet build ${{ vars.CSPROJ_PATH }}
+```
+
+
 
 > When building a MAUI app, you might need to supply a --framework condition like: --framework net8.0
 
