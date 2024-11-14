@@ -56,7 +56,7 @@ Even though most CI/CD runners use YAML files for their steps definitions, each 
 | **permissions** | Specifies what resources the job can access within the repository. |
 | **needs** | Specifies job dependencies. Basically means that the job after the keyword needs to run first in order for this job to run successfully. Essentially defines the order of execution.  |
 
-Note: When you specify multiple events after the `on` keyword, all jobs contained in the same workflow file will run whenever any of those events occur. If you need different workflows to run on occurrence of different events, you will need to include multiple workflow files.
+> Note: When you specify multiple events after the `on` keyword, all jobs contained in the same workflow file will run whenever any of those events occur. If you need different workflows to run on occurrence of different events, you will need to include multiple workflow files.
 
 Here is an template for a very basic workflow file:
 
@@ -81,11 +81,12 @@ jobs:
         run: echo "Some command" 
 ```
 
-### Secrets and Variables
+### Secrets and environment variables
+You might sometimes need to use values that are sensitive to configure your CI/CD pipelines successfully. Since they are sensitive, it is a very bad idea to commit them to a repository, especially if it's public. Locally, you can manually create configuration files and fill the sensitive information yourself or if you are working in a company, this might be sent to you over secure channels. 
 
-Sometimes, you may need environment variables or secrets in your pipeline. Github has a solution for this: Secrets & Variables.
+CI/CD pipelines run automatically in the cloud so they don't have access to those local files. GitHub provides us with **secrets**. They are encrypted values that are used to securely store sensitive information and are not visible in the repository, but Actions can still access them. 
 
-> Something about secrets :)
+You should use secrets for anything that could be exploited to gain unauthorised access, e.g. connection strings, API keys, passwords, access tokens etc.
 
 ## 2. Building and Testing .Net
 
