@@ -11,31 +11,54 @@ In this tutorial, you will learn how to:
     *   Doxygen
     *   Database migration using entity framework
 
-### Before you start
+## Before you start
 Before you start working through this tutorial, it might be useful to take a look at the notes about Continuous Integration/Deployment, and DevOps in general. This will explain the concepts we use in this tutorial. You can find these here: [DevOps notes](https://edinburgh-napier.github.io/remote_test/notes/unit7_devops/).
 
 To work through the steps outlined in this document, you need to have a dotnet project. This pipeline should work with any dotnet project, but for the purpose of this module, make sure you have completed the first tutorial on setting up a MAUI project, which you can find here: [Getting started with MAUI](https://edinburgh-napier.github.io/remote_test/tutorials/csharp/maui/maui.html).
 
-## 1. Github Actions
+## 1. GitHub Actions
+GitHub Actions is a powerful CI/CD solution integrated into GitHub repositories. It allows developers to create workflows that run when certain events occur within a repository. A workflow is GitHub's name for a pipeline. For example, you can have a workflow that runs anytime new code is pushed to the master branch and checks whether the code builds and runs correctly. 
 
-Setup (or assume) a github rep?
-Public repo, so you don't incur costs
+GitHub Actions can be used for free by anyone as long as the project is open-source. That means that the repository that hosts your code must be public. Otherwise, every workflow run incurs additional costs.
+
+You can check that your repository for this project is public by going to its main page in GitHub. If it is, a "Public" badge will be displayed next to the name of the repository.
+
+![Checking whether a repository is public](images/public-repo.png)
 
 ### Workflow File
+Creating a standard workflow in GitHub Actions is easy. GitHub provides a wide array of templates for creating a new workflow. It can even suggest the most suitable template based on the languages you use in your project.  In every GitHub repository, there is an **Actions** tab where you can setup a new workflow or monitor your current ones. 
 
-In the root of your project (where your .git folder is) create a directory '.github/workflows'. Any .yml file in this folder will be interpreted as a pipeline in Github Actions. You can now create a file named 'workflow.yml', which will store all the instructions for your pipeline.
+![Actions tab in GitHub](images/actions-tab.png)
+
+In this tutorial, you will write your own workflow file from scratch to get an in-depth understanding of what each line does. If you decide you want to know a bit more about Actions, GitHub has a very comprehensive documentation, which you can find here: [GitHub Actions documentation](https://docs.github.com/en/actions). 
+
+Every workflow file is in the YAML format, which is commonly used for configuration and uses minimal syntax. YAML files can have either the .yaml or .yml extension. Both are accepted by GitHub Actions - the choice is down to personal preference. 
+
+To set up your first GitHub Actions workflow manually, create a `.github` directory in the root folder of your project (note the leading dot) and then a `workflows` directory inside it. Then, create a file named `workflow.yml` which will store all the instructions for your pipeline. Any `.yml` or `.yaml` file in this folder will be interpreted as a workflow in Github Actions. Your file structure should look like this:
+
+![File structure for workflow](images/file-structure.png)
 
 ### Syntax
+Even though most CI/CD runners use YAML files for their steps definitions, each of them requires a different syntax. GitHub Actions is event-oriented, which means that it first defines the event that will trigger the following jobs. The table below outlines different keywords used in GitHub's workflow files that will be used in this tutorial. A full list is available in the documentation: [GitHub Actions Syntax Docs](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions).
 
 | Keyword   | Description   |
-| --- | --- |
-| on   | This is how you declare what events will cause the pipeline to run.   |
-| jobs   | A collection of actions that represent one item in you pipeline.   |
-| runs-on   | Declaration of which operating system will run your job.    |
-| steps  | List of actions contained in a job.    |
-| uses  | Call an existing action.    |
-| run  | Run a command. Tip: You can run a sequence of commands using pipes.    |
+| ---       | ---           |
+| **name**  | Sets the name of the workflow, which is used by GitHub Actions to identify specific workflows. |
+| **on**        | Declares what events will cause the pipeline defined in the file to run. There can be one or more of these. Examples of events include push or pull request. |
+| **jobs**      | A collection of high-level stages in the pipeline. Each job has a set of steps to execute. For example, we can have a build job and a deploy job.  |
+| **runs-on**   | Specifies which operating system will run your job.    |
+| **steps**     | List of steps contained in a job. Each step starts with `- name: <name of step>`. Each step has its own commands to run or configurations to set up. |
+| **uses**      | Specifies an existing action to be used within the step. They can come from GitHub's marketplace or a repository.    |
+| **run**       | Runs a command or script. Tip: You can run a sequence of commands using pipes.    |
+| **with** | Typically used in conjunction with **uses**, it provides input parameters for an action to configure how it runs. |
+| **if** | Adds a conditional statement to a job or a step. |
+| **env** | Defines environment variables for a job or a step. This can be used to pass parameters to a command, script or an action. | 
+| **permissions** | Specifies what resources the job can access within the repository. |
+| **needs** | Specifies job dependencies. Basically means that the job after the keyword needs to run first in order for this job to run successfully. Essentially defines the order of execution.  |
 
+Note: When you specify multiple events after the `on` keyword, all jobs contained in the same workflow file will run whenever any of those events occur. If you need different workflows to run on occurrence of different events, you will need to include multiple workflow files.
+
+Here is an template for a very basic workflow file:
 
 ``` yml
 name: <Name of your pipeline> 
@@ -57,7 +80,6 @@ jobs:
       - name: <Name of step>
         run: echo "Some command" 
 ```
-All syntax is available in the [Github Actions Documentation](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions)
 
 ### Secrets and Variables
 
