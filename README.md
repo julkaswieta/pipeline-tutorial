@@ -90,13 +90,13 @@ Now that you have an understanding of the syntax used in workflow files, you can
 > It might be a good idea to create a new branch before you start making any changes, e.g. `feature/workflow`. 
 
 ### Setting up your workflow file
-To set up your first GitHub Actions workflow manually, create a `.github` directory in the root folder of your project (note the leading dot) and then a `workflows` directory inside it. Then, create a file named `workflow.yml` which will store all the instructions for your pipeline. Any `.yml` or `.yaml` file in this folder will be interpreted as a workflow in Github Actions. Your file structure should look like this:
+To set up your first GitHub Actions workflow manually, create a `.github` directory in the root folder of your project (note the leading dot) and then a `workflows` directory inside it. Then, create a file named `build.yml` which will store all the instructions for your pipeline. Any `.yml` or `.yaml` file in this folder will be interpreted as a workflow in Github Actions. Your file structure should look like this:
 
 ![File structure for workflow](images/file-structure.png)
 
 The first step in creating pipelines is deciding what events will trigger the runs. It could run anytime something is pushed to any of the branches, or only to some selected branches. Another option is to run the workflow on pull requests, which we will use as an example in this tutorial. A full breakdown can be found in the documentation: [Triggering a workflow](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow). 
 
-Start your file by putting the following code in the `workflow.yml` file:
+Start your file by putting the following code in the `build.yml` file:
 ```yml
 name: Build & Test # the name can be anything else you want
 
@@ -208,7 +208,7 @@ At this point, you can commit your changes and push. Then, when you open a pull 
 ## 3. Extending your pipeline with external tools
 You now know how to create a basic pipeline that builds and tests your code. You can expand the pipeline by adding external tools for static code analysis, database migrations, documentation generation or many other things that will add value to the automatic runs.
 
-### Static code analysis wit SonarQube Cloud
+### Static code analysis with SonarQube Cloud
 Static code analysis can tell us a lot about the quality of the code written. SonarQube Cloud is a cloud-based version of the SonarQube code analyser. You can find information about the local usage of SonarQube in this tutorial: [SonarQube](https://edinburgh-napier.github.io/remote_test/tutorials/tools/sonarqube/).
 
 #### Setting up a SonarCloud account, organization and project
@@ -309,6 +309,7 @@ In the next two steps, the first one will try to get the SonarCloud scanner from
 ```
 
 These are all steps that you need to set up SonarCloud. Now you can move on to running the analysis. The way it works is you start the scanner, build and test your project, and then stop the scanner. This means that the build and test steps need to be encapsulated by the sonar start and end steps, like in the code below. Make sure that you replace `<organisation>` with Sonar organisation key and the `<key>` with your Sonar project key (keep the double quotes around these values). You can find them in the Information tab:
+
 ![Organisation and project keys in Sonar](images/keys.png)
 
 > Make sure the build and test steps are between the Sonar start and Sonar end steps. Also make sure to replace the organisation and project keys with your own.
@@ -332,18 +333,24 @@ The code to use:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 ```
+Note the use of the `SONAR_TOKEN` secret. Using this notation you can use any other secrets you add to the repository. 
+
 Your workflow should now be setup to automatically run Sonar analysis. Go ahead and commit and push your changes. Then, if you still have a pull request open on the same branch, the workflow will be trigerred automatically. If not, you can open a new PR.
 
 The results of the analysis will be available in the SonarCloud interface. 
 
-### Doxygen
+### Automatic documentation generation with Doxygen
+Documentation is important, especially in larger projects with multiple contributors. Doing this manually can be time-consuming but fortunately it can be sped up by using automatic documentation generators like Doxygen. 
 
-Doxygen is a tool that generates a web-based representation of your project's documentation. It takes the comments from your code and produces HTML files with all of the details.
+Doxygen is a tool that generates a web-based representation of your project's documentation and takes care of all formatting for you. It takes the comments from your code and produces HTML files with all of the details. You can see more about Doxygen in this document: [Documentation](https://edinburgh-napier.github.io/remote_test/notes/unit6_applications/documentation.html).
 
+Here is an example of documentation generated by Doxygen:
 
 ![Fig. 2. Example Doxygen Output](images/Doxygen_Example.png)
 
-It might be best to create a new workflow file that runs only on pushes to master, so that your documentation site is not updated with anything outside of your main branch.
+Since documentation should be stable and reflect the stable version of the code, it might be a good idea to include documentation generation in a workflow that runs only when changes are pushed to the master/main branch, which we suggest in this tutorial. 
+
+The current workflow runs on any pull requests, so you need to create a new file in the workflows folder. Here is the initial code that checks out code from the repository:
 
 ``` yml
 name: Documentation 
@@ -355,43 +362,62 @@ on:
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+```
 
+Doxygen must be installed on the workflow runner, which can be done with this step:
+
+```yml
     - name: Install Doxygen
       run: sudo apt-get install doxygen -y
+```
+Doxygen requires the presence of a configuration file called Doxyfile. It defines rules about how the final documentation should be generated, e.g. formatting. You should have Doxyfile in the project folder, but if you don't, then you can generate the default one by running `doxygen -g`.
 
+Once you are sure you have the Doxyfile, you can generate documentation using the command below. 
+
+> Once again, remember that workflows run in the root folder of your repository so you must provide a path relative to that folder. 
+
+```yml
     - name: Generate Doxygen Documentation
       run: doxygen <path to Doxygen file>
 ```
 
-This job generates the documentation but it would be better if we could access it from the web. To do this, you can use Github pages by uploading the generated artifacts and then deploying to Github pages.
+#### Automatic deployment of the documentation
+The steps above generate the documentation but it would be better if we could access it from the web. You can use GitHub Pages to do this. The generated artifacts can be uploaded and used to deploy the documentation to GitHub Pages.
 
-First you must add a step to the 'generate' job which uploads the artifacts to Github pages:
-
-> You will need write permissions for the job to access Github pages.
-
+First you must add a step which will upload the artifacts generated in the previous step to Github Pages. This uses a pre-defined action:
 
 ``` yml
-    permissions:
-      pages: write
-      id-token: write
-
     - name: Upload static files as artifact
       uses: actions/upload-pages-artifact@v3 
       with:
         path: html
 ```
 
+You will need to grant write permissions to the job so it can access Github Pages. To declare this, you can add these lines to the `generate` job like so:
 
-You should add a new job called 'deploy' after the generation job with the following contents.
+```yml
+jobs:
+  generate:
+    runs-on: ubuntu-latest 
+
+    permissions:
+      pages: write
+      id-token: write 
+```
+> The job also needs permissions to generate an OIDC token (`id-token: write`). If you want to learn more about what they are, you can check out this article: [ID Token vs Access Token](https://auth0.com/blog/id-token-access-token-what-is-the-difference/).
+ 
+Now that GitHub Pages has access to the generated documentation, you can add a new job that deploys the documentation. The job also needs the write permissions. Additionally, you should specify the environment to integrate with GitHub Pages and store the URL of the deployed site so you can access it easily. 
 
 ``` yml
   deploy:
     needs: generate
     runs-on: ubuntu-latest
+
     permissions:
       pages: write
       id-token: write
@@ -405,7 +431,7 @@ You should add a new job called 'deploy' after the generation job with the follo
         id: deployment
         uses: actions/deploy-pages@v4
 ```
-
+> The deployment can also be bundled with the generation. That would simplify things and remove the need for the step where you upload the static files as artifacts since the deploy step could see them without it. However, to keep things modular, we decided to separate them into two jobs. 
 
 ### Database Migration
 
