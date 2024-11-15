@@ -238,9 +238,28 @@ Finally, you need to choose what Sonar considers new code in the repository. You
 
 ![Selecting what is new code](images/new-code.png)
 
-#### Adding SonarCloud to your workflow
+#### Adding Sonar Token as a repository secret
+SonarCloud can be integrated with your workflow so that anytime the workflow runs, it will trigger a static code analysis by Sonar. 
 
+The first step to setting this up is adding a secret in GitHub that contains an access token to Sonar. To find out what the token is, follow the steps below:
 
+In your main project page in Sonar, go to `Administration` and then select `Analysis Method`.
+
+![Analysis method](images/analysis-method-sonar.png)
+
+At the bottom of the page, select `With GitHub Actions`.
+
+![Setup GitHub in Sonar](images/setup-github-sonar.png)
+
+On the final page, make sure you disable automatic analysis and then copy the value of SONAR_TOKEN. 
+
+![Secret in Sonar](images/secret-sonar.png)
+
+You can now add the secret in GitHub Actions, in a similar way as you added the environement variable above. Make sure you are in the `Secrets` tab and then add a new secret with the name `SONAR_TOKEN` and the value copied from Sonar. Without this, your workflow will fail as it won't be able to connect to Sonar properly. 
+
+> Don't proceed with adding the steps if you don't have the token as a secret.
+
+#### Adding Sonar steps to the workflow
 
 Add all this stuff to your workflow file.
 
