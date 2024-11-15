@@ -308,7 +308,7 @@ In the next two steps, the first one will try to get the SonarCloud scanner from
         dotnet tool update dotnet-sonarscanner --tool-path ../.sonar/scanner
 ```
 
-These are all steps that you need to set up SonarCloud. Now you can move on to running the analysis. The way it works is you start the scanner, build and test your project, and then stop the scanner. This means that the build and test steps need to be encapsulated by the sonar start and end steps, like in the code below. Make sure that you replace `<organisation>` with Sonar organisation key and the `<key>` with your Sonar project key. You can find them in the Information tab:
+These are all steps that you need to set up SonarCloud. Now you can move on to running the analysis. The way it works is you start the scanner, build and test your project, and then stop the scanner. This means that the build and test steps need to be encapsulated by the sonar start and end steps, like in the code below. Make sure that you replace `<organisation>` with Sonar organisation key and the `<key>` with your Sonar project key (keep the double quotes around these values). You can find them in the Information tab:
 ![Organisation and project keys in Sonar](images/keys.png)
 
 > Make sure the build and test steps are between the Sonar start and Sonar end steps. Also make sure to replace the organisation and project keys with your own.
@@ -320,7 +320,7 @@ The code to use:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:<key>" /o:"<organisation>" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:"<key>" /o:"<organisation>" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
 
     #Build and test steps here
     #
@@ -332,6 +332,9 @@ The code to use:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 ```
+Your workflow should now be setup to automatically run Sonar analysis. Go ahead and commit and push your changes. Then, if you still have a pull request open on the same branch, the workflow will be trigerred automatically. If not, you can open a new PR.
+
+The results of the analysis will be available in the SonarCloud interface. 
 
 ### Doxygen
 
