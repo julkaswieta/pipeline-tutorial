@@ -260,8 +260,11 @@ You can now add the secret in GitHub Actions, in a similar way as you added the 
 > Don't proceed with adding the steps if you don't have the token as a secret.
 
 #### Adding Sonar steps to the workflow
+Now it's time to modify the workflow file to include analysis by SonarCloud. Unfortunately, the setup required before running the scanner is a bit lenghty because Sonar carries its own dependencies and needs to be installed before it can be used. Fortunately, SonarCloud provides all the configuration in their documentation: [SonarQube docs](https://docs.sonarsource.com/sonarqube/10.6/devops-platform-integration/github-integration/adding-analysis-to-github-actions-workflow/)
 
-Add all this stuff to your workflow file.
+> **Important!!** In the workflow file, you should setup Sonar when you are setting up the environment for the project itself. So the following Sonar setup steps should be placed after the `Restore dependencies` step but before the Build step. 
+
+The SonarCloud Scanner internally requires a Java runtime environment to execute. Without it, the scanner won't run, even for non-Java projects so the first step in Sonar's environment setup is setting up the JDK, which is done through a pre-defined action. Place the following code in the right place in your workflow file:
 
 ``` yml
     #Setup a Java JDK
@@ -270,15 +273,24 @@ Add all this stuff to your workflow file.
       with:
         java-version: 17
         distribution: 'zulu'
+```
 
-    #Cache Sonar Dependencies
+The next step is to get the dependencies that are cached. If no dependencies are cached, this step will simply do nothing and then all the necessary dependencies will need to be installed in one of the following steps. If there are some cached dependencies, they will be restored to speed up the process. Paste the following code below the JDK setup:
+
+```yml
+    # Get the SonarCloud dependencies from cache
     - name: Cache SonarCloud packages
       uses: actions/cache@v4
       with:
         path: ~/sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
+```
 
+In the next two steps, the first one will try to get the SonarCloud scanner from cache, but if it's not found, the second one will install it. Paste this code below the `Cache SonarCloud packages` step:
+
+```yml
+    # Get the SonarCloud scanner from cache
     - name: Cache SonarCloud scanner
       id: cache-sonar-scanner
       uses: actions/cache@v4
@@ -294,7 +306,16 @@ Add all this stuff to your workflow file.
         mkdir -p ./.sonar/scanner
         cd ./Pipeline
         dotnet tool update dotnet-sonarscanner --tool-path ../.sonar/scanner
+```
 
+These are all steps that you need to set up SonarCloud. Now you can move on to running the analysis. The way it works is you start the scanner, build and test your project, and then stop the scanner. This means that the build and test steps need to be encapsulated by the sonar start and end steps, like in the code below. Make sure that you replace `<organisation>` with Sonar organisation key and the `<key>` with your Sonar project key. You can find them in the Information tab:
+![Organisation and project keys in Sonar](images/keys.png)
+
+> Make sure the build and test steps are between the Sonar start and Sonar end steps. Also make sure to replace the organisation and project keys with your own.
+
+The code to use:
+
+```yml
     - name: Start Sonar Analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -310,7 +331,6 @@ Add all this stuff to your workflow file.
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-
 ```
 
 ### Doxygen
