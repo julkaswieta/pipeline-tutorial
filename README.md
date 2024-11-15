@@ -413,9 +413,11 @@ jobs:
  
 Now that GitHub Pages has access to the generated documentation, you can add a new job that deploys the documentation. The job also needs the write permissions. Additionally, you should specify the environment to integrate with GitHub Pages and store the URL of the deployed site so you can access it easily. 
 
+> The `needs` keyword specifies that this job requires the `generate` job to run. If the `generate` job fails, the `deploy` job will not run, so the documentation will not be deployed.
+
 ``` yml
   deploy:
-    needs: generate
+    needs: generate # will only run after the generate job completes
     runs-on: ubuntu-latest
 
     permissions:
