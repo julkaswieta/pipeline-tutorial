@@ -433,9 +433,14 @@ Now that GitHub Pages has access to the generated documentation, you can add a n
         id: deployment
         uses: actions/deploy-pages@v4
 ```
-> The deployment can also be bundled with the generation. That would simplify things and remove the need for the step where you upload the static files as artifacts since the deploy step could see them without it. However, to keep things modular, we decided to separate them into two jobs. 
+> The deployment can also be bundled with the generation. That would simplify things and remove the need for the step where you upload the static files as artifacts since the deploy step could see them without it. However, to keep things modular, we decided to separate them into two jobs.
 
-### Database Migration
+The last step to make sure everything works is enabling GitHub Pages in your repository. Navigate to repository Settings and select Pages in the menu on the left. Then, make sure that `GitHub Actions` is selected as the source in the dropdown menu.
+![Enabling GitHub Pages in the repo](images/pages-enable.png)
+
+Go ahead and commit and push the changes now. If you still have that pull request from before open, the basic build workflow will be trigerred. Then, when you decide to merge it into the master branch, the documentation workflow will be trigerred and will deploy the docs to GitHub Pages. Try it out yourself.
+
+### Database Migration - TODO
 
 After updating the datamodels in your application, you can use entity framework to migrate those changes into your database.
 
