@@ -202,7 +202,28 @@ In GitHub Actions, you can run tests as part of the workflow. Usually, you'll wa
       run: dotnet test <path to .sln>
 ```
 
-At this point, you can commit your changes and push them to the remote repository. Then, when you open a pull request to merge your changes to another branch, you will trigger your workflow run. Go ahead and do this now to check your workflow runs properly. You can do this from GitHub. 
+### Checking whether your pipeline works
+At this point, you can commit your changes and push them to the remote repository. Then, when you open a pull request to merge your changes to another branch, you will trigger your workflow run. You should know how to open a pull request from previous tutorials. 
+
+If your workflow is set up correctly, you should be able to see it on the pull request page after a few seconds. If you click on `Details`, it will take you to the summary of the run in the Actions tab.
+
+![alt text](images/actions-in-pr.png)
+
+You will see a screen similar to this: 
+
+![alt text](images/actions-summary.png)
+
+In the panel on the left, from the top, you can see:
+- the name of the workflow, 
+- the name of the pull request the run is part of and the status of the entire workflow
+- Summary tab
+- list of jobs with their statuses
+- Run details such as resource usage and the workflow file that was used for the run
+
+If all statuses are green, that means your pipeline ran successfully. 
+
+In the bigger panel on the right, you can see a list of steps that were executed in the run. Have a look at it to verify that all steps you expect to see are there. You can expand each step to see what its output was by pressing the `>` next to the step's name.
+
 
 ## 3. Extending your pipeline with external tools
 You now know how to create a basic pipeline that builds and tests your code. You can expand the pipeline by adding external tools for static code analysis, database migrations, documentation generation or many other things that will add value to the automatic runs.
@@ -338,7 +359,7 @@ Make sure that you replace `<organisation>` with Sonar organisation key and `<ke
 
 Also, note the use of the `SONAR_TOKEN` secret in the code. Using this notation you can use any other secrets you add to the repository. 
 
-Your workflow should now be set up to automatically run Sonar analysis. Go ahead and commit and push your changes. Then, if you still have a pull request open on the same branch, the workflow will be triggered automatically. If not, you can open a new PR.
+Your workflow should now be set up to automatically run Sonar analysis. Go ahead and commit and push your changes. Then, if you still have a pull request open on the same branch, the workflow will be triggered automatically. If not, you can open a new PR. Make sure to check whether your pipeline ran successfully in the `Actions` tab in GitHub.
 
 The results of the analysis will be available in the SonarCloud interface. 
 
@@ -442,4 +463,4 @@ The last step to make sure everything works is enabling GitHub Pages in your rep
 
 ![Enabling GitHub Pages in the repo](images/pages-enable.png)
 
-Go ahead and commit and push the changes now. If you still have that pull request from before open, the basic build workflow will be trigerred. Then, when you decide to merge it into the master branch, the documentation workflow will be trigerred and will deploy the docs to GitHub Pages. Try it out yourself.
+Go ahead and commit and push the changes now. If you still have that pull request from before open, the basic build workflow will be triggered. Then, when you decide to merge it into the master branch, the documentation workflow will be triggered and will deploy the docs to GitHub Pages. Try it out yourself and make sure if your workflows ran successfully in the `Actions` tab. 
