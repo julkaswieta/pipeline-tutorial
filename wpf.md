@@ -186,8 +186,8 @@ The next step is ensuring that the environment is set up properly and all tools 
 
     Workloads in .NET projects are various additional tools, libraries or features that are not included in the SDK by default. They are defined in the `.csproj` file so the command needs a correct path to that file. 
 
-    > [!IMPORTANT]
-    > It's important to remember that all commands in the workflow will be executed from the root of your project, so you must supply a relative path to your `.csproj` file, e.g. `./Notes/Notes.csproj`. Make sure the paths are relative to the root of the project, not the workflows folder. 
+> [!IMPORTANT]
+> It's important to remember that all commands in the workflow will be executed from the root of your project, so you must supply a relative path to your `.csproj` file, e.g. `./Notes/Notes.csproj`. Make sure the paths are relative to the root of the project, not the workflows folder. 
 
 5. Apart from restoring workloads, you must also restore dependencies to ensure the project works properly. Add this step and again make sure the path to the main `.csproj` file is correct
 
@@ -297,8 +297,8 @@ At this point, your workflow should be set up to successfuly build and test the 
 
 1. Commit your changes and push them to the remote repository. 
 
-    > [!CAUTION]
-    > As we have said at the beginning, please make sure you commit the changes to a new branch, **not the main branch**. Since the workflow is set up to be triggered on a pull request, this is necessary. If you have not created a new branch yet, you can still do it now.
+> [!CAUTION]
+> As we have said at the beginning, please make sure you commit the changes to a new branch, **not the main branch**. Since the workflow is set up to be triggered on a pull request, this is necessary. If you have not created a new branch yet, you can still do it now.
 
 2. Open a pull request to merge your changes to the main branch. If you don't know how to do this, check out this [tutorial](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) or ask for help.
 
@@ -321,7 +321,7 @@ At this point, your workflow should be set up to successfuly build and test the 
 
     In the bigger panel on the right, you can see a list of steps that were executed in the run. Have a look at it to verify that all steps you expect to see are there. You can expand each step to see what its output was by pressing the `>` next to the step's name.
 
-    > [!NOTE]
-    > Note that it takes several minutes to complete the workflow due to the setup steps. 
+> [!NOTE]
+> Note that it takes several minutes to complete the workflow due to the setup steps. 
 
 At this point, your workflow should run successfully, building and testing your project. 
