@@ -189,7 +189,7 @@ Congratulations, now you have your source code stored in GitHub and can proceed 
 GitHub Actions is a powerful CI/CD solution integrated into GitHub repositories. It allows 
 developers to create workflows that run when certain events occur within a repository. A workflow 
 is GitHub's name for a pipeline. For example, you can have a workflow that runs anytime new code 
-is pushed to the master branch and checks whether the code builds and runs correctly. 
+is pushed to the main branch and checks whether the code builds and runs correctly. 
 
 GitHub Actions can be used for free by anyone as long as the project is open-source. That means 
 that the repository that hosts your code must be **public**. Otherwise, every workflow run incurs 
@@ -261,21 +261,36 @@ jobs:
 Now that you understand the syntax used in workflow files, you can move on to implementing your 
 own workflow. 
 
-The first step will be to create a new branch in your repository. If you are not sure how to do it, check out one of these tutorials: [Creating a branch from Visual Studio](https://learn.microsoft.com/en-us/visualstudio/version-control/git-create-branch?view=vs-2022) | [Creating a new branch from command line](https://www.w3schools.com/git/git_branch.asp?remote=github). 
+The first step will be to create a new branch in your repository. A branch is a new version of the main codebase. It allows you to introduce some changes that may break the code and still keep the version that definitely works on your main branch. So far, all your code is stored on the main branch. 
 
-> [!CAUTION]
-> Make sure you are working on the newly created branch before proceeding. Use `git checkout <branch-name>` to switch between branches.
+To create a new branch, open Command Prompt/Terminal, navigate to your app's source code folder with the `cd` command and type: `git checkout -b workflow`. This will create a new branch called `workflow` and switch into it so any changes you make stay on that newly-created branch and do not affect the main branch. 
+
+To check you have successfully switched to the `workflow` branch, type `git status`. It should say 
+```
+On branch workflow
+nothing to commit, working tree clean
+```
+>[!CAUTION]
+>If your output is different, ask for help.
+
+Now you can push your new branch to GitHub by typing: `git push -u origin workflow`.
 
 ### Setting up your workflow file
-To set up your first GitHub Actions workflow manually:
-1. Create a `.github` directory in the root folder of your repository (note the leading dot) 
-2. Then, create a `workflows` directory inside the `.github` folder. 
-3. Finally, create a file named `build.yml` which will store all instructions for your pipeline. **Any `.yml` or 
-`.yaml` file in this folder will be interpreted as a workflow in GitHub Actions.** This file structure is defined by GitHub and must be followed to trigger automatic runs.
+To set up your first GitHub Actions workflow, you will use GitHub to create the file.
+1. Go to the main page of your GitHub repository. 
+2. In the dropdown box on the left-hand side, select the `workflow` branch
 
-Your file structure should look like this:
+![alt text](images/select-branch.png)
 
-![](images/file-structure.png)
+3. In the top right corner, select `Add file > Create new file`
+
+![alt text](images/new-file.png)
+
+4. On the next page, in the `Name your file` textbox, type: `.github/workflows/build.yaml/`. As you type, GitHub will recognise that `.github` and `workflows` are folders so the final filename should look like this:
+
+![alt text](images/filename.png)
+
+The `build.yaml` file will store all instructions for yout pipeline.
 
 The first step in creating pipelines is deciding what events will trigger the runs. It could run 
 anytime something is pushed to any of the branches, or only to some selected branches. Another 
@@ -291,7 +306,7 @@ on:
   [pull_request]
 ```
 
-The name of your workflow can be anything you want so feel free to replace **Build & Test Workflow** with something else of your choosing.
+This workflow will be triggered anytime you open a pull request. A pull request is a proposal to merge a set of changes from one branch into another. In a development team, you would open a pull request anytime you want to contribute code for a new feature or a bug fix and then other developers have a chance to look at your code and make comments before it gets accepted. When you get approval from co-developers, you can **merge** the pull request into the main branch to finalise your contribution.
 
 > [!IMPORTANT]
 > Indentation plays an important role in `.yaml/.yml` files so make sure you copy the code correctly.
@@ -313,12 +328,9 @@ The name of your workflow can be anything you want so feel free to replace **Bui
           runs-on: windows-latest
     ```
 
-    > [!NOTE]
-    > Even though it may seem that **build** is a keyword in the code above, it is not. It is just a name of a job. As we've explained, you can have many jobs in your workflow file, and each needs a name, which can be anything, so feel free to change it to experiment. Since this job's primary function is to build the code, we have chosen **build** as the name.
-
 2. You can start defining the order of the steps in the job. Usually, the starting point is ensuring that the workflow can access the source code. In GitHub Actions, you can use a **standard action** that checks out the code from the repository. 
 
-    Update your code to look like this:
+    **Update your code to look like this:**
 
     ```yml
     name: Build & Test Workflow
@@ -337,7 +349,7 @@ The name of your workflow can be anything you want so feel free to replace **Bui
 
 The next step is ensuring that the environment is set up properly and all tools needed to build the code are installed. In .NET projects, this involves setting up the .NET SDK, and restoring workloads and dependencies. 
 
-3. To set up the SDK, you can use a standard action and provide it with the version of .NET that you require, in this case 8.0. Add this code below the previous step:
+3. To set up the SDK, you can use a standard action and provide it with the version of .NET that you require, in this case 8.0. **Add this code below the previous step**:
 
     ``` yml
         - name: Setup .NET
@@ -346,7 +358,7 @@ The next step is ensuring that the environment is set up properly and all tools 
             dotnet-version: 8.0
     ```
 
-4. To restore .NET workloads, add this step, making sure you provide the path to the Notes.csproj file:
+4. To restore .NET workloads, add this step, making sure you **provide the path to the .csproj file in your project**:
 
     ```yml
         - name: Restore workloads
@@ -356,9 +368,9 @@ The next step is ensuring that the environment is set up properly and all tools 
     Workloads in .NET projects are various additional tools, libraries or features that are not included in the SDK by default. They are defined in the `.csproj` file so the command needs a correct path to that file. 
 
 > [!IMPORTANT]
-> It's important to remember that all commands in the workflow will be executed from the root of your project, so you must supply a relative path to your `.csproj` file, e.g. `./Notes/Notes.csproj`. Make sure the paths are relative to the root of the project, not the workflows folder. 
+> Make sure you've replaced the `<Path to .csproj>` with the correct path for your project. It's important to remember that all commands in the workflow will be executed from the root of your project, so you must supply a relative path to your `.csproj` file, e.g. `./Notes/Notes.csproj`. Make sure the paths are relative to the root of the project, not the workflows folder. 
 
-5. Apart from restoring workloads, you must also restore dependencies to ensure the project works properly. Add this step and again make sure the path to the main `.csproj` file is correct
+5. Apart from restoring workloads, you must also restore dependencies to ensure the project works properly. **Add this step and again make sure the path to the main `.csproj` file is correct**
 
     ```yml
         - name: Restore dependencies
@@ -366,12 +378,12 @@ The next step is ensuring that the environment is set up properly and all tools 
     ```
 
 ### Building the project
-Now that you've got the source code checked out and the environment set up, you can move on to building the project. **Add the following build step to your workflow:**
+Now that you've got the source code checked out and the environment set up, you can move on to building the project. **Add the following build step to your workflow and replace the path:**
 
-    ``` yml
+```yml
         - name: Build project
           run: dotnet build <path to .csproj file> 
-    ```
+```
 
 ### Testing the code
 Testing is a critical element of any CI/CD pipeline. Automatically running a suite of tests speeds up development significantly, while ensuring that the application remains fully functional and the recent changes have not introduced any bugs (or at least the bugs covered by tests).
@@ -381,7 +393,7 @@ In GitHub Actions, you can run tests as part of the workflow. Usually, you'll wa
 > [!CAUTION]
 > In all previous steps, you needed a path to the `.csproj` file, but in this case, it's the `.sln` file because tests will usually be defined in a separate project that makes use of the base project. The solution file brings them both together so they can communicate. 
 
-**Add this code to the bottom of your workflow:**
+**Add this code to the bottom of your workflow and provide the correct relative path to your solution file:**
 
 ``` yml
     - name: test
@@ -389,7 +401,7 @@ In GitHub Actions, you can run tests as part of the workflow. Usually, you'll wa
 ```
 
 ### Checkpoint
-At this point, your workflow file should look like this (the paths to the `.csproj` and `.sln` files will be different):
+At this point, your workflow file should look like this (**the paths to the `.csproj` and `.sln` files will be different**):
 
 ```yml
 name: Build & Test Workflow
@@ -464,18 +476,21 @@ Go ahead and replace all paths to the `.csproj` file in your workflow.
 ## 3. Checking whether your pipeline works
 At this point, your workflow should be set up to successfuly build and test the project. 
 
-1. Commit your changes and push them to the remote repository. 
+1. Commit your changes by pressing the green `Commit changes` button in the top-right corner. In the popup window, keep the message as is and click `Commit changes` again.
 
-> [!CAUTION]
-> As we have said at the beginning, please make sure you commit the changes to a new branch, **not the main branch**. Since the workflow is set up to be triggered on a pull request, this is necessary. If you have not created a new branch yet, you can still do it now.
+![alt text](images/commit.png)
 
-2. Open a pull request to merge your changes to the main branch. If you don't know how to do this, check out this [tutorial](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) or ask for help.
+2. Since the workflow we're creating is triggered on pull requests, you need to open one. Navigate to the `Pull requests` tab in your repository where you should see a yellow message saying "workflows had recent pushes X minutes ago". Click on `Compare & pull request` in that message.
 
-3. If your workflow is set up correctly, you should be able to see the newly trigerred workflow on the pull request page after a few seconds. If you click on `Details`, it will take you to the summary of the run in the Actions tab.
+![alt text](images/new-pr.png)
+
+3. On the next screen, scroll down and select `Create pull request`.
+
+4. If your workflow is set up correctly, you should be able to see the newly trigerred workflow on the pull request page after a few seconds. If you click on `Details`, it will take you to the summary of the run in the Actions tab.
 
     ![](images/actions-in-pr.png)
 
-4. You should see a screen similar to this: 
+5. You should see a screen similar to this: 
 
     ![](images/actions-summary.png)
 
@@ -494,3 +509,5 @@ At this point, your workflow should be set up to successfuly build and test the 
 > Note that it takes several minutes to complete the workflow due to the setup steps. 
 
 At this point, your workflow should run successfully, building and testing your project. 
+
+In this tutorial, you have learned the basics of Git and GitHub use and you have set up a basic GitHub Actions workflow that builds and tests your application code. If you got stuck at any point in the tutorial, please ask for help. 
